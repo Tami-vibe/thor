@@ -1,0 +1,187 @@
+# THOR — AI Landing Page Generator
+# Cursor Rules — Captain's Standing Orders
+
+## IDENTITY
+- **Product**: Thor — AI-powered landing page generator
+- **Audience**: Business professionals and owners across fitness, legal, medical, finance, SaaS, hospitality, beauty, language schools, and community sectors.
+
+## RULES — ALWAYS APPLY WITHOUT BEING TOLD
+1. **RESPONSIVE FIRST**: every component mobile-first.
+   - Mobile < 640px, Tablet 640-1024px, Desktop > 1024px
+   - Use Tailwind `sm:` `md:` `lg:` prefixes on everything.
+
+2. **NO DROPDOWNS**: ever. Use card selectors or pills.
+
+3. **NO EMOJIS**: use icons only (Lucide React or inline SVG when Lucide lacks a required brand mark).
+
+4. **NO DUPLICATE CTAs**: one call to action per screen.
+
+5. **NO FOCUS RINGS**: `outline-none focus:outline-none focus:ring-0` on all interactive elements.
+
+6. **NO BROWSER DEFAULTS** bleeding through on any element.
+
+7. **DARK + LIGHT MODE**: every component must support both.
+   - Use theme-aware Tailwind classes (and/or CSS variables where appropriate).
+
+8. **PREMIUM QUALITY CHECK**: before finishing any component ask:
+   - “Would Apple’s California design team ship this?”
+   - If no, improve it.
+
+9. **ANIMATIONS**: subtle only.
+   - Never animate layout properties.
+   - Use `transform` and `opacity` only.
+   - Duration 150–300ms for interactions.
+   - Duration 2–4s for ambient animations.
+
+10. **MODALS** always:
+   - `max-w-xl`, `rounded-2xl`, backdrop-blur overlay
+   - `bg-black/60` backdrop, overflow-y-auto, `max-h-[90vh]`
+   - `p-8`, `gap-4` between elements
+   - Never clip card borders. Keep padding around selector grids.
+
+11. **PERFORMANCE**:
+   - `will-change: transform` on animated elements.
+   - CSS transforms only, never animate layout properties.
+
+12. **ONE DIRECTION**:
+   - Don’t suggest alternatives unless asked.
+   - Execute the brief precisely.
+
+13. **SCREENSHOT-AS-SPEC**:
+   - When the user provides a reference screenshot, treat it as a binding UI spec for hierarchy, spacing, and interaction.
+   - Do not add extra UI (badges, promos, featured rings) unless explicitly requested.
+
+---
+
+# Thor — Design System (2026 Premium)
+
+Apple precision, Norse power. Every new component MUST follow this system.
+
+## Typography
+
+Load via `next/font/google` in `app/layout.tsx`:
+
+| Role | Font | Weights | CSS variable |
+|------|------|---------|--------------|
+| Headlines / wordmark | Fraunces | 300, 400, 700, 900 | `--font-fraunces` |
+| UI, body, buttons | Inter | 400, 500, 600 | `--font-inter` |
+
+- Body default: `font-sans` → Inter
+- Display / headlines: `font-display` → Fraunces
+- Never use Geist or system serif for marketing headlines
+
+## Color tokens
+
+| Token | Hex | Usage |
+|-------|-----|--------|
+| Lightning Blue (primary) | `#0EA5E9` | Icons, accents, Mjolnir line |
+| Storm Gold (accent) | `#EAB308` | Selected cards/pills, active step dots |
+| Storm Sky (dark bg) | `#0A0F1E` | Dark page background, dark navbar scroll |
+| Card/modal dark | `#111827` | Dark modals, cards, selector tiles |
+| Border dark | `#1E293B` | Dark borders, inactive dots |
+| Text primary dark | `#F8FAFC` | Headlines & primary text on dark |
+| Text secondary dark | `#64748B` | Muted copy, placeholders on dark |
+| Light background | `#FFFFFF` | Light page |
+| Light card/modal | `#F8FAFC` | Light modals, cards |
+| Light border | `#E2E8F0` | Light borders |
+| Light navbar border | `#F1F5F9` | Light navbar bottom border |
+| Text primary light | `#0A0F1E` | Body/UI on light |
+| Hero headline light | `#0F172A` | Hero headline only (light mode) |
+| Hero subheadline light | `#94A3B8` | Hero subheadline (light mode) |
+| Hero subheadline dark | `#64748B` | Hero subheadline (dark mode) |
+| Selected tint | `rgba(234, 179, 8, 0.08)` | Selected card/pill background |
+| Hover tint | `rgba(14, 165, 233, 0.05)` | Card/pill hover background |
+
+## Dark mode
+
+- Page background: `#0A0F1E`
+- Navbar: transparent at top → `#0A0F1E/90` + `backdrop-blur-md` on scroll
+- Modal/card: `#111827`, border `#1E293B`
+- Text primary: `#F8FAFC`, secondary: `#64748B`
+
+## Light mode
+
+- Page background: `#FFFFFF`
+- Navbar: white + `border-bottom 1px #F1F5F9` (always or on scroll per implementation)
+- Modal/card: `#F8FAFC`, border `#E2E8F0`
+- Text primary: `#0A0F1E`, secondary: `#64748B`
+
+## Theme
+
+- Toggle: Sun (dark mode) / Moon (light mode), Lucide, 20px (`h-5 w-5`)
+- Persist: `localStorage` key `thor-theme` (`dark` | `light`)
+- Transitions: `300ms ease-in-out` on color/background changes
+
+## Navbar
+
+- Font: Inter throughout
+- Wordmark “Thor”: Fraunces 700, 22px (`font-display text-[22px] font-bold`)
+- Lightning bolt: Lucide `Zap`, `#0EA5E9`, 20px, before wordmark
+- Sign in: Inter 500, 15px
+- **No** Get Started in navbar — hero CTA only
+- Right: Sign in + theme toggle
+
+## Hero
+
+- Layout: centered, `max-w-4xl`, `min-h-[100dvh]`, vertical center
+- **No** aurora, gradients, or mouse-follow effects on hero
+- Headline (Fraunces 900):
+  - Line 1: “For the ones who”
+  - Line 2: “mean ” + accent “business.” in `#0EA5E9`
+  - Sizes: 88px desktop (`lg:`), 56px tablet (`sm:`), 40px mobile
+  - `tracking-[-0.02em]`, `leading-none`, `max-w-[720px]` centered
+  - Dark: `#F8FAFC`, Light: `#0F172A`
+- Subheadline (Inter 400): 18px desktop (`lg:text-lg`), 16px mobile (`text-base`), `max-w-[440px]`, `mt-6` (24px)
+- **Mjolnir edge**: 1px × 120px horizontal line, `#0EA5E9`, `opacity-40`, centered between subheadline and CTA (`mt-6` after subheadline)
+- Get Started button:
+  - Inter 600, `h-[52px]`, `px-10`, `rounded-full`, bg `#0EA5E9`, white text
+  - Hover: `#0284C7`, `scale-[1.02]`, `transition-all duration-200 ease-out`
+  - `mt-11` (44px) below Mjolnir line
+  - No border
+
+## Modals
+
+- Backdrop: `bg-black/60 backdrop-blur-sm`
+- Theme-aware shell (see dark/light tokens above)
+- 6 steps; carousel `w-[600%]`; gold active step dot
+- Card selectors: 2 col mobile, 3 col `sm+`, heights 80/90/100px
+- Default card border `#334155` (dark) / `#E2E8F0` (light)
+- Hover: 1.5px `#0EA5E9` border + blue tint + scale 1.02
+- Selected: 1.5px `#EAB308` border + gold tint
+- Icons on cards: 20px `#0EA5E9`
+- No focus rings on cards: `outline-none focus:ring-0`
+
+## Buttons
+
+- Primary (Claude-style): bg `#0A0F1E`, white text, hover `#111827`
+- Thor blue `#0EA5E9` is an accent color, not the default button fill
+- Storm Gold `#EAB308` reserved for selection states, not primary button hover
+- Min tap target: 44px (`min-h-11`)
+- No focus rings (see standing orders above)
+
+## Implementation rules
+
+- Copy lives in structured `copy` objects — no hardcoded visible strings in JSX
+- Tailwind arbitrary values: `bg-[#0EA5E9]`, etc.
+- Mobile-first (`sm:`, `lg:`)
+- No dropdowns — cards or pills only
+- Do NOT use green/emerald palette
+- Do NOT reintroduce aurora or animated hero backgrounds
+
+## TECH STACK
+- Next.js App Router
+- Tailwind CSS
+- Lucide React icons
+- Fraunces + Inter from Google Fonts
+- Supabase (Week 2)
+- Claude API via `/api/generate` route
+
+## CURRENT BUILD STATUS
+- Hero: complete
+- Navbar: complete (hammer mark + premium subtle motion)
+- Modal: 6-step flow complete
+- Dark/Light toggle: complete
+- Pricing: complete (Monthly/Yearly toggle, whole-number yearly math, aligned CTAs, “Try Thor” CTAs)
+- FAQ: complete (minimal accordion, plus rotates to x)
+- Footer: complete (minimal black footer with social icons)
+- API integration: IN PROGRESS (next)
