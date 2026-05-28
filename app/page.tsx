@@ -47,6 +47,11 @@ type ClaudeGenerated = {
   ctaSubtext: string;
 };
 
+type DesignFamily = import("@/lib/designSystem").DesignFamily;
+type VariationPersonality = import("@/lib/designSystem").VariationPersonality;
+type Variation = { name: VariationPersonality; personality: string; angle: string };
+type ClaudeGeneratedWithDesign = ClaudeGenerated & { designFamily: DesignFamily; variation: Variation };
+
 export default function Home() {
   const [selectedSectorId, setSelectedSectorId] = useState<SectorId | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
@@ -58,7 +63,7 @@ export default function Home() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
-  const [generated, setGenerated] = useState<ClaudeGenerated | null>(null);
+  const [generated, setGenerated] = useState<ClaudeGeneratedWithDesign | null>(null);
 
   const [businessName, setBusinessName] = useState("");
   const [selling, setSelling] = useState("");
@@ -385,7 +390,7 @@ export default function Home() {
         throw new Error(err?.error ?? "Request failed");
       }
 
-      const data = (await res.json()) as ClaudeGenerated;
+      const data = (await res.json()) as ClaudeGeneratedWithDesign;
       setGenerated(data);
       closeModal();
     } catch (e) {
@@ -501,6 +506,8 @@ export default function Home() {
       <GeneratedPage
         businessName={businessName || copy.brandName}
         data={generated}
+        designFamily={generated.designFamily}
+        variation={generated.variation}
         theme={theme}
         onToggleTheme={toggleTheme}
         onRegenerate={() => {

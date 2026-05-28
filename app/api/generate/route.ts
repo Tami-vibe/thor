@@ -1,4 +1,11 @@
 import { NextResponse } from "next/server";
+import {
+  generateVariationSeed,
+  getDesignFamily,
+  getRandomLayoutVariant,
+  type DesignFamily,
+  type VariationPersonality,
+} from "@/lib/designSystem";
 
 type GenerateRequestBody = {
   businessName: string;
@@ -23,6 +30,34 @@ type ClaudeGenerated = {
   ctaText: string;
   ctaSubtext: string;
 };
+
+type Variation = {
+  name: VariationPersonality;
+  personality: string;
+  angle: string;
+};
+
+function getVariation(personality: VariationPersonality): Variation {
+  if (personality === "authority") {
+    return {
+      name: "authority",
+      personality: "Authoritative, proof-led, decisive. Crisp sentences. Confident and calm.",
+      angle: "Credibility, outcomes, and clear next steps.",
+    };
+  }
+  if (personality === "emotion") {
+    return {
+      name: "emotion",
+      personality: "Human, empathetic, desire-forward. Speak to the before-and-after experience.",
+      angle: "Pain-to-relief, desire-to-outcome, and emotional clarity.",
+    };
+  }
+  return {
+    name: "disruptor",
+    personality: "Direct and contrarian. Call out the old way and replace it with a sharper promise.",
+    angle: "Pattern interrupt, blunt specificity, and a strong point of view.",
+  };
+}
 
 function toErrorMessage(err: unknown) {
   if (err instanceof Error) return err.message;
@@ -84,7 +119,19 @@ export async function POST(req: Request) {
       }
     }
 
-    const systemPrompt = `You are an expert landing page copywriter specializing in ${body.sector} businesses. Write conversion-focused landing page copy that feels human, specific, and premium — never generic. Speak directly to the ideal client's pain points and desires.`;
+    const designFamily = getDesignFamily(body.sector, body.subcategory);
+    console.log("[generate] sector:", body.sector, "designFamily:", designFamily.id);
+    const variationSeed = generateVariationSeed();
+    const variation = getVariation(variationSeed);
+    const layout = getRandomLayoutVariant();
+
+    const systemPrompt = `You are an expert landing page copywriter specializing in ${body.sector} businesses. Write conversion-focused landing page copy that feels human, specific, and premium — never generic. Speak directly to the ideal client's pain points and desires.
+
+Design personality: ${variation.personality}
+Copywriting angle: ${variation.angle}
+Color personality: ${designFamily.personality}
+Font headline: ${designFamily.fonts.display.family}
+Layout variant: ${layout.label}`;
 
     const userPrompt = `Create landing page copy for:
 Business: ${body.businessName}
@@ -121,7 +168,7 @@ Return ONLY a JSON object with these exact keys:
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5",
         max_tokens: 1200,
         temperature: 0.4,
         system: systemPrompt,
@@ -131,6 +178,11 @@ Return ONLY a JSON object with these exact keys:
 
     if (!anthropicRes.ok) {
       const text = await anthropicRes.text().catch(() => "");
+      console.error("[/api/generate] Claude API error", {
+        status: anthropicRes.status,
+        statusText: anthropicRes.statusText,
+        body: text,
+      });
       return NextResponse.json(
         { error: "Claude API error", status: anthropicRes.status, details: text.slice(0, 500) },
         { status: 500 },
@@ -155,11 +207,23 @@ Return ONLY a JSON object with these exact keys:
     }
 
     if (!isClaudeGenerated(parsed)) {
+      console.error("[/api/generate] Claude response shape invalid", parsed);
       return NextResponse.json({ error: "Claude response shape invalid", raw: parsed }, { status: 500 });
     }
 
-    return NextResponse.json(parsed, { status: 200 });
+    const response = {
+      ...(parsed as ClaudeGenerated),
+      designFamily,
+      variation,
+    };
+    console.log("[/api/generate] response", response);
+
+    return NextResponse.json(
+      response,
+      { status: 200 },
+    );
   } catch (err) {
+    console.error("[/api/generate] Unexpected error", err);
     return NextResponse.json({ error: "Unexpected error", details: toErrorMessage(err) }, { status: 500 });
   }
 }
