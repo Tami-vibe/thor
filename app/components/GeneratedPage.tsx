@@ -32,6 +32,7 @@ export function GeneratedPage({
   onRegenerate,
   contact,
   copy,
+  topInset = false,
 }: {
   businessName: string;
   data: ClaudeGenerated;
@@ -41,6 +42,7 @@ export function GeneratedPage({
   onToggleTheme: () => void;
   onRegenerate: () => void;
   contact: { email?: string; phone?: string };
+  topInset?: boolean;
   copy: {
     navRegenerate: string;
     navCta: string;
@@ -107,7 +109,7 @@ export function GeneratedPage({
       style={{ ...rootStyle, backgroundColor: "var(--color-bg)", color: "var(--color-text)" }}
       data-variation={variation.name}
     >
-      <div className="fixed right-6 top-[76px] z-40">
+      <div className={`fixed right-6 z-40 ${topInset ? "top-[7.75rem]" : "top-[76px]"}`}>
         <span
           className="inline-flex rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 font-medium"
           style={{
@@ -121,7 +123,7 @@ export function GeneratedPage({
         </span>
       </div>
       <header
-        className="fixed inset-x-0 top-0 z-40 flex h-16 items-center backdrop-blur-md"
+        className={`fixed inset-x-0 z-40 flex h-16 items-center backdrop-blur-md ${topInset ? "top-11" : "top-0"}`}
         style={{
           backgroundColor: "var(--color-nav-backdrop)",
           borderBottom: isLight ? "1px solid var(--color-nav-border)" : undefined,
@@ -150,7 +152,7 @@ export function GeneratedPage({
         </div>
       </header>
 
-      <main className="px-6 pt-24">
+      <main className={`px-6 ${topInset ? "pt-[7.75rem]" : "pt-24"}`}>
         <section className="mx-auto w-full max-w-4xl text-center">
           <h1
             className="mx-auto max-w-[720px] text-[40px] font-black leading-none tracking-[-0.02em] sm:text-[56px] lg:text-[72px]"

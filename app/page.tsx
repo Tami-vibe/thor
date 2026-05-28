@@ -17,6 +17,8 @@ import {
   UtensilsCrossed,
   X,
 } from "lucide-react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import { GeneratedPage } from "./components/GeneratedPage";
@@ -53,6 +55,7 @@ type Variation = { name: VariationPersonality; personality: string; angle: strin
 type ClaudeGeneratedWithDesign = ClaudeGenerated & { designFamily: DesignFamily; variation: Variation };
 
 export default function Home() {
+  const { data: session, status: sessionStatus } = useSession();
   const [selectedSectorId, setSelectedSectorId] = useState<SectorId | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [selectedVisitorAction, setSelectedVisitorAction] = useState<string | null>(null);
@@ -211,6 +214,8 @@ export default function Home() {
     generatedWhyPrefix: "Why",
     generatedTestimonialAria: "Testimonial",
     generatedBuiltWithThor: "Built with Thor",
+    savePageBanner: "Sign in to save this page to your dashboard",
+    savePageBannerCta: "Sign in",
     visitorActions: [
       { id: "book-consultation", label: "Book a Consultation" },
       { id: "start-free-trial", label: "Start Free Trial" },
@@ -501,30 +506,49 @@ export default function Home() {
 
   const uploadZone = `flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl p-4 text-center transition-all duration-150 hover:border-[#0EA5E9] ${ui.uploadZone}`;
 
+  const showSaveBanner = Boolean(generated && sessionStatus !== "loading" && !session);
+
   if (generated) {
     return (
-      <GeneratedPage
-        businessName={businessName || copy.brandName}
-        data={generated}
-        designFamily={generated.designFamily}
-        variation={generated.variation}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        onRegenerate={() => {
-          setGenerated(null);
-          setGenerateError(null);
-          setModalStep(1);
-          setModalOpen(true);
-        }}
-        contact={{ email: contactEmail || undefined, phone: phone || undefined }}
-        copy={{
-          navRegenerate: copy.generatedNavRegenerate,
-          navCta: copy.generatedNavCta,
-          whyTitlePrefix: copy.generatedWhyPrefix,
-          testimonialAria: copy.generatedTestimonialAria,
-          builtWithThor: copy.generatedBuiltWithThor,
-        }}
-      />
+      <>
+        {showSaveBanner ? (
+          <div
+            className="fixed inset-x-0 top-0 z-50 flex items-center justify-center gap-3 border-b border-[#1E293B] bg-[#111827]/95 px-4 py-2.5 text-center backdrop-blur-md sm:gap-4"
+            role="status"
+          >
+            <p className="text-sm text-[#94A3B8]">{copy.savePageBanner}</p>
+            <Link
+              href="/auth/signin"
+              className="shrink-0 text-sm font-semibold text-[#0EA5E9] transition-colors duration-200 hover:text-[#0284C7] focus:outline-none focus:ring-0"
+            >
+              {copy.savePageBannerCta}
+            </Link>
+          </div>
+        ) : null}
+        <GeneratedPage
+            businessName={businessName || copy.brandName}
+            data={generated}
+            designFamily={generated.designFamily}
+            variation={generated.variation}
+            theme={theme}
+            topInset={showSaveBanner}
+            onToggleTheme={toggleTheme}
+            onRegenerate={() => {
+              setGenerated(null);
+              setGenerateError(null);
+              setModalStep(1);
+              setModalOpen(true);
+            }}
+            contact={{ email: contactEmail || undefined, phone: phone || undefined }}
+            copy={{
+              navRegenerate: copy.generatedNavRegenerate,
+              navCta: copy.generatedNavCta,
+              whyTitlePrefix: copy.generatedWhyPrefix,
+              testimonialAria: copy.generatedTestimonialAria,
+              builtWithThor: copy.generatedBuiltWithThor,
+            }}
+          />
+      </>
     );
   }
 
@@ -736,12 +760,12 @@ export default function Home() {
             </span>
           </div>
           <div className="flex items-center gap-4 sm:gap-5">
-            <button
-              type="button"
-              className={`text-[15px] font-medium transition-colors duration-300 ease-in-out focus:outline-none ${ui.signIn}`}
+            <Link
+              href="/auth/signin"
+              className={`text-[15px] font-medium transition-colors duration-300 ease-in-out focus:outline-none focus:ring-0 ${ui.signIn}`}
             >
               {copy.signIn}
-            </button>
+            </Link>
             <button
               type="button"
               onClick={toggleTheme}
