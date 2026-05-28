@@ -119,13 +119,21 @@ export async function POST(req: Request) {
       }
     }
 
-    const designFamily = getDesignFamily(body.sector, body.subcategory);
-    console.log("[generate] sector:", body.sector, "designFamily:", designFamily.id);
+    const businessName = body.businessName ?? "";
+    const sector = body.sector ?? "";
+    const subcategory = body.subcategory ?? "";
+    const offer = body.offer ?? "";
+    const idealClient = body.idealClient ?? "";
+    const result = body.result ?? "";
+    const cta = body.cta ?? "";
+
+    const designFamily = getDesignFamily(sector, subcategory);
+    console.log("[generate] sector:", sector, "designFamily:", designFamily.id);
     const variationSeed = generateVariationSeed();
     const variation = getVariation(variationSeed);
     const layout = getRandomLayoutVariant();
 
-    const systemPrompt = `You are an expert landing page copywriter specializing in ${body.sector} businesses. Write conversion-focused landing page copy that feels human, specific, and premium — never generic. Speak directly to the ideal client's pain points and desires.
+    const systemPrompt = `You are an expert landing page copywriter specializing in ${sector} businesses. Write conversion-focused landing page copy that feels human, specific, and premium — never generic. Speak directly to the ideal client's pain points and desires.
 
 Design personality: ${variation.personality}
 Copywriting angle: ${variation.angle}
@@ -134,12 +142,12 @@ Font headline: ${designFamily.fonts.display.family}
 Layout variant: ${layout.label}`;
 
     const userPrompt = `Create landing page copy for:
-Business: ${body.businessName}
-Type: ${body.sector} → ${body.subcategory}
-Offer: ${body.offer}
-Ideal client: ${body.idealClient}
-Result delivered: ${body.result}
-CTA goal: ${body.cta}
+Business: ${businessName}
+Type: ${sector} → ${subcategory}
+Offer: ${offer}
+Ideal client: ${idealClient}
+Result delivered: ${result}
+CTA goal: ${cta}
 
 Return ONLY a JSON object with these exact keys:
 {
